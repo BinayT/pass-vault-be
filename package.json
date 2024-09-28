@@ -1,10 +1,33 @@
 {
+  "name": "pass-vault",
+  "version": "1.0.0",
+  "description": "Pass valut application's backend where it will serve a frontend React Native application.",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "api",
+    "backend",
+    "typescript"
+  ],
+  "author": "bindev",
+  "type": "commonjs",
+  "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "pg": "^8.13.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.4"
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.4",
+    "@types/pg": "^8.11.10",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
   }
 }
