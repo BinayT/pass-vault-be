@@ -1,18 +1,17 @@
 
-import { v4 as uuidv4 } from 'uuid';
 
 export interface User {
-    id: string;             // Unique identifier for the user
+    id?: string;             // Unique identifier for the user
     email: string;         // User's email address
     username: string;      // User's chosen username
-    passwordHash: string;  // Hashed password for security
-    createdAt: Date;       // Account creation timestamp
+    password: string;  // Hashed password for security
+    created_at: Date;       // Account creation timestamp
 }
 
 export const UserModel = {
     tableName: 'users',
     schema: {
-        id: { type: 'uuid', default: () => uuidv4() },
+        id: { type: 'uuid', unique: true },
         email: { type: 'string', unique: true, required: true },
         username: { type: 'string', unique: true, required: true },
         passwordHash: { type: 'string', required: true },
