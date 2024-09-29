@@ -61,7 +61,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         .select('*')
         .or(`email.eq.${emailOrUsername},username.eq.${emailOrUsername}`)
         .single();
-    console.log(error);
     
     if (!user || error) {
         res.status(401).json({ message: 'Invalid email/username or password' });
@@ -69,7 +68,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Compare the password
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
         res.status(401).json({ message: 'Invalid email/username or password' });
