@@ -1,4 +1,4 @@
-
+import { VaultEntry } from '@models/Vault';
 
 export interface User {
     id?: string;             // Unique identifier for the user

@@ -2,27 +2,27 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
-export interface PasswordEntry {
+export interface VaultEntry {
     id: string;            // Unique identifier for the password entry
-    userId: string;       // Reference to the user who owns this entry
-    websiteName: string;  // Name of the website
+    user_email: string;       // Reference to the user who owns this entry
+    website: string;  // Name of the website
     email?: string;        // Email associated with the account
     username?: string;     // Username for the account
     password: string;     // Password for the account (hashed in production)
-    comments?: string;    // Additional comments or notes
+    notes?: string;    // Additional comments or notes
     createdAt: Date;      // Timestamp when the entry was created
 }
 
 export const PasswordEntryModel = {
-    tableName: 'password_entries',
+    tableName: 'vaults',
     schema: {
         id: { type: 'uuid', default: () => uuidv4() },
-        userId: { type: 'uuid', required: true },
-        websiteName: { type: 'string', required: true },
+        user_email: { type: 'string', required: true, references: 'users(email)' },
+        website: { type: 'string', required: true },
         email: { type: 'string' },
         username: { type: 'string' },
         password: { type: 'string', required: true },
-        comments: { type: 'string', optional: true },
+        notes: { type: 'string', optional: true },
         createdAt: { type: 'timestamp', default: () => new Date() },
     },
 };
