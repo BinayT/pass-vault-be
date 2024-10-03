@@ -3,6 +3,7 @@ import { User } from '@models/User';
 import supabase from '../../config/db';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { getAllUserVaults } from '@controllers/Vault/VaultController';
 
 // Function to register a new user
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
@@ -75,6 +76,25 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
-    // If login is successful, return a success message (consider using JWT for actual authentication)
-    res.status(200).json({ message: 'Login successful', userId: user.id });
+    // Fetch the vaults of the user after successful login
+    const { data: vaults, error: vaultsError } = await supabase
+        .from('vaults')
+        .select('*')
+        .eq('user_email', user.email);
+
+    if (vaultsError) {
+        res.status(500).json({ message: 'Error fetching vaults', error: vaultsError });
+        return;
+    }
+
+    // If login is successful, we return the user data + the vaults of the user
+    res.status(200).json({
+        message: 'Login successful',
+        user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+        },
+        vaults,
+    });
 };

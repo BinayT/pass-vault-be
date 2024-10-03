@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import supabase from '../../config/db';
 
 export const registerVault = async (req: Request, res: Response): Promise<void> => {
-    const { user_email, website, email, username, password, notes } = req.body;
+    const { user_email, site, site_email, site_username, site_password, notes } = req.body;
 
      // Validate that userId is present
      if (!user_email) {
@@ -13,10 +13,10 @@ export const registerVault = async (req: Request, res: Response): Promise<void> 
     // Save the new vault to db.
     const dataToSave = {
         user_email,
-        website,
-        email,
-        username,
-        password,
+        site,
+        site_email,
+        site_username,
+        site_password,
         notes
     }
 
