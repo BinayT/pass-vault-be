@@ -1,6 +1,6 @@
 import express from 'express';
 import {  } from '../controllers/User/UserController';
-import { getAllUserVaults, registerVault, getSingleVault, updateVault } from '../controllers/Vault/VaultController';
+import { getAllUserVaults, registerVault, getSingleVault, updateVault, deleteVault } from '../controllers/Vault/VaultController';
 
 const router = express.Router();
 
@@ -15,5 +15,8 @@ router.post('/registervault', registerVault);
 
 // Route for updating a single vault
 router.put('/updatevault', updateVault);
+
+// Route for deleting a single vault
+router.delete('/deletevault', deleteVault);
 
 export default router;

@@ -92,3 +92,23 @@ export const updateVault = async (req: Request, res: Response): Promise<void> =>
 
     res.status(200).json({ message: 'Vault updated successfully' });
 };
+
+export const deleteVault = async (req: Request, res: Response): Promise<void> => {
+    const {vault_id} = req.body;
+
+    if(!vault_id){
+        res.status(500).json({message: 'Something went wrong, please try again later!'})
+    }
+
+    const {error} = await supabase
+        .from('vaults')
+        .delete()
+        .eq('id', vault_id);
+
+    if (error) {
+        res.status(500).json({ message: 'Error deleting the vault.', error });
+        return;
+    }
+
+    res.status(200).json({ message: 'Vault deleted successfully' });
+}
