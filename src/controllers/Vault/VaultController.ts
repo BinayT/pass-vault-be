@@ -59,3 +59,36 @@ export const getSingleVault = async (req: Request, res: Response): Promise<void>
 
     res.status(200).json({ data: valut });
 }
+
+
+export const updateVault = async (req: Request, res: Response): Promise<void> => {
+    const { vault_id, site, site_email, site_username, site_password, notes } = req.body;
+
+    // Validate that vault_id is present
+    if (!vault_id) {
+        res.status(400).json({ message: 'No vault ID provided' });
+        return;
+    }
+
+    // Object containing the fields to update
+    const fieldsToUpdate: Record<string, any> = {};
+
+    if (site) fieldsToUpdate.site = site;
+    if (site_email) fieldsToUpdate.site_email = site_email;
+    if (site_username) fieldsToUpdate.site_username = site_username;
+    if (site_password) fieldsToUpdate.site_password = site_password;
+    if (notes) fieldsToUpdate.notes = notes;
+
+    // Update the vault with the given fields
+    const { error } = await supabase
+        .from('vaults')
+        .update(fieldsToUpdate)
+        .eq('id', vault_id);
+
+    if (error) {
+        res.status(500).json({ message: 'Error updating the vault', error });
+        return;
+    }
+
+    res.status(200).json({ message: 'Vault updated successfully' });
+};
