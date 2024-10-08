@@ -1,6 +1,5 @@
 import express from 'express';
-import {  } from '../controllers/User/UserController';
-import { getAllUserVaults, registerVault, getSingleVault, updateVault, deleteVault } from '../controllers/Vault/VaultController';
+import { getAllUserVaults, registerVault, getSingleVault, updateVault, deleteVault, getDecryptedPassword } from '@controllers/Vault/VaultController';
 
 const router = express.Router();
 
@@ -9,6 +8,7 @@ router.get('/getallvaults', getAllUserVaults);
 
 // Route for getting a single vault entry
 router.get('/getvault', getSingleVault); 
+router.get('/getdecryptedvault', getDecryptedPassword); 
 
 // Route for registering a single vault
 router.post('/registervault', registerVault);

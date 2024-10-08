@@ -1,26 +1,28 @@
 import { Request, Response } from 'express';
-import supabase from '../../config/db';
+import { decryptPassword, encryptPassword } from '@helpers/passwordEncryption';
+import supabase from '@config/db';
+
+
 
 export const registerVault = async (req: Request, res: Response): Promise<void> => {
     const { user_email, site, site_email, site_username, site_password, notes } = req.body;
 
-     // Validate that userId is present
      if (!user_email) {
         res.status(400).json({ message: 'No user found!' });
         return;
     }
 
-    // Save the new vault to db.
+    const {iv, encryptedData} = encryptPassword(site_password)
     const dataToSave = {
         user_email,
         site,
         site_email,
         site_username,
-        site_password,
-        notes
+        site_password : encryptedData,
+        notes, 
+        iv
     }
 
-     // Insert the new vault into the vaults table
      const { error } = await supabase.from('vaults').insert(dataToSave);
 
      if (error) {
@@ -29,6 +31,8 @@ export const registerVault = async (req: Request, res: Response): Promise<void> 
      }
      res.status(201).json({ message: 'Vault created successfully' });
 };
+
+
 
 export const getAllUserVaults = async (req: Request, res: Response): Promise<void> => {
     const { user_email } = req.body;
@@ -44,6 +48,8 @@ export const getAllUserVaults = async (req: Request, res: Response): Promise<voi
 
     res.status(200).json({ data: allVault });
 }
+
+
 
 export const getSingleVault = async (req: Request, res: Response): Promise<void> => {
     const { vault_id } = req.body;
@@ -61,16 +67,36 @@ export const getSingleVault = async (req: Request, res: Response): Promise<void>
 }
 
 
+
+export const getDecryptedPassword = async (req: Request, res: Response): Promise<void> => {
+    const { vault_id } = req.query;
+
+    // Fetch the specific vault entry
+    const { data: vault, error } = await supabase
+        .from('vaults')
+        .select('site_password, iv')
+        .eq('id', vault_id)
+        .single();
+
+    if (error || !vault) {
+        res.status(404).json({ message: 'Vault not found' });
+        return;
+    }
+
+    const decryptedPassword = decryptPassword(vault.site_password, vault.iv);
+    res.status(200).json({ decryptedPassword });
+};
+
+
+
 export const updateVault = async (req: Request, res: Response): Promise<void> => {
     const { vault_id, site, site_email, site_username, site_password, notes } = req.body;
 
-    // Validate that vault_id is present
     if (!vault_id) {
         res.status(400).json({ message: 'No vault ID provided' });
         return;
     }
 
-    // Object containing the fields to update
     const fieldsToUpdate: Record<string, any> = {};
 
     if (site) fieldsToUpdate.site = site;
@@ -79,7 +105,6 @@ export const updateVault = async (req: Request, res: Response): Promise<void> =>
     if (site_password) fieldsToUpdate.site_password = site_password;
     if (notes) fieldsToUpdate.notes = notes;
 
-    // Update the vault with the given fields
     const { error } = await supabase
         .from('vaults')
         .update(fieldsToUpdate)
@@ -92,6 +117,8 @@ export const updateVault = async (req: Request, res: Response): Promise<void> =>
 
     res.status(200).json({ message: 'Vault updated successfully' });
 };
+
+
 
 export const deleteVault = async (req: Request, res: Response): Promise<void> => {
     const {vault_id} = req.body;

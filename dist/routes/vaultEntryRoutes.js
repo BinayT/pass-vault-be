@@ -4,12 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const VaultController_1 = require("../controllers/Vault/VaultController");
+const VaultController_1 = require("@controllers/Vault/VaultController");
 const router = express_1.default.Router();
 // Route for getting all user vaults
 router.get('/getallvaults', VaultController_1.getAllUserVaults);
 // Route for getting a single vault entry
 router.get('/getvault', VaultController_1.getSingleVault);
+router.get('/getdecryptedvault', VaultController_1.getDecryptedPassword);
 // Route for registering a single vault
 router.post('/registervault', VaultController_1.registerVault);
 // Route for updating a single vault

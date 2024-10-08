@@ -1,7 +1,7 @@
 import express from 'express';
 
-import userRoutes from './routes/userRoutes';
-import vaultEntryRoutes from './routes/vaultEntryRoutes';
+import userRoutes from '@routes/userRoutes';
+import vaultEntryRoutes from '@routes/vaultEntryRoutes';
 
 const app = express();
 const port = process.env.PORT || 3000;

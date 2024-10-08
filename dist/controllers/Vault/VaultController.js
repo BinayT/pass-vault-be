@@ -12,25 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVault = exports.updateVault = exports.getSingleVault = exports.getAllUserVaults = exports.registerVault = void 0;
-const db_1 = __importDefault(require("../../config/db"));
+exports.deleteVault = exports.updateVault = exports.getDecryptedPassword = exports.getSingleVault = exports.getAllUserVaults = exports.registerVault = void 0;
+const passwordEncryption_1 = require("@helpers/passwordEncryption");
+const db_1 = __importDefault(require("@config/db"));
 const registerVault = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_email, site, site_email, site_username, site_password, notes } = req.body;
-    // Validate that userId is present
     if (!user_email) {
         res.status(400).json({ message: 'No user found!' });
         return;
     }
-    // Save the new vault to db.
+    const { iv, encryptedData } = (0, passwordEncryption_1.encryptPassword)(site_password);
     const dataToSave = {
         user_email,
         site,
         site_email,
         site_username,
-        site_password,
-        notes
+        site_password: encryptedData,
+        notes,
+        iv
     };
-    // Insert the new vault into the vaults table
     const { error } = yield db_1.default.from('vaults').insert(dataToSave);
     if (error) {
         res.status(500).json({ message: 'Error creating vault', error });
@@ -65,14 +65,28 @@ const getSingleVault = (req, res) => __awaiter(void 0, void 0, void 0, function*
     res.status(200).json({ data: valut });
 });
 exports.getSingleVault = getSingleVault;
+const getDecryptedPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { vault_id } = req.query;
+    // Fetch the specific vault entry
+    const { data: vault, error } = yield db_1.default
+        .from('vaults')
+        .select('site_password, iv')
+        .eq('id', vault_id)
+        .single();
+    if (error || !vault) {
+        res.status(404).json({ message: 'Vault not found' });
+        return;
+    }
+    const decryptedPassword = (0, passwordEncryption_1.decryptPassword)(vault.site_password, vault.iv);
+    res.status(200).json({ decryptedPassword });
+});
+exports.getDecryptedPassword = getDecryptedPassword;
 const updateVault = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { vault_id, site, site_email, site_username, site_password, notes } = req.body;
-    // Validate that vault_id is present
     if (!vault_id) {
         res.status(400).json({ message: 'No vault ID provided' });
         return;
     }
-    // Object containing the fields to update
     const fieldsToUpdate = {};
     if (site)
         fieldsToUpdate.site = site;
@@ -84,7 +98,6 @@ const updateVault = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         fieldsToUpdate.site_password = site_password;
     if (notes)
         fieldsToUpdate.notes = notes;
-    // Update the vault with the given fields
     const { error } = yield db_1.default
         .from('vaults')
         .update(fieldsToUpdate)
