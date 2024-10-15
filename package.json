@@ -21,7 +21,8 @@
     "@config": "dist/config",
     "@routes": "dist/routes",
     "@helpers": "dist/helpers",
-    "@utils": "dist/utils"
+    "@utils": "dist/utils",
+    "@middlewares": "dist/middlewares"
   },
   "author": "bindev",
   "type": "commonjs",

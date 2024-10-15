@@ -1,5 +1,5 @@
 export interface User {
-    id?: string;             // Unique identifier for the user
+    id: string;             // Unique identifier for the user
     email: string;         // User's email address
     username: string;      // User's chosen username
     password: string;  // Hashed password for security

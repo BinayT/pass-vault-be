@@ -3,6 +3,7 @@ import { User } from '@models/User';
 import supabase from '@config/db';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { generateToken } from '@utils/generateJWTToken';
 
 
 
@@ -36,7 +37,19 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
         return;
     }
 
-    res.status(201).json({ message: 'User registered successfully' });
+    const jwtToken = generateToken(newUser?.id)
+
+    res.status(201).json({ 
+        message: 'User registered successfully',
+        jwtToken,
+        user:{
+            id: newUser.id,
+            email: newUser.email,
+            username: newUser.username,
+        }
+    },
+        
+    );
 };
 
 
@@ -62,12 +75,15 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
+    const jwtToken = generateToken(user.id);
+
     res.status(200).json({
         message: 'Login successful',
         user: {
             id: user.id,
             email: user.email,
             username: user.username,
-        }
+        },
+        jwtToken
     });
 };

@@ -16,6 +16,7 @@ exports.loginUser = exports.registerUser = void 0;
 const db_1 = __importDefault(require("@config/db"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const uuid_1 = require("uuid");
+const generateJWTToken_1 = require("@utils/generateJWTToken");
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, username, password } = req.body;
     const { data, error: userError } = yield db_1.default
@@ -39,7 +40,16 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(500).json({ message: 'Error creating user', error });
         return;
     }
-    res.status(201).json({ message: 'User registered successfully' });
+    const jwtToken = (0, generateJWTToken_1.generateToken)(newUser === null || newUser === void 0 ? void 0 : newUser.id);
+    res.status(201).json({
+        message: 'User registered successfully',
+        jwtToken,
+        user: {
+            id: newUser.id,
+            email: newUser.email,
+            username: newUser.username,
+        }
+    });
 });
 exports.registerUser = registerUser;
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -58,13 +68,15 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(401).json({ message: 'Invalid email/username or password' });
         return;
     }
+    const jwtToken = (0, generateJWTToken_1.generateToken)(user.id);
     res.status(200).json({
         message: 'Login successful',
         user: {
             id: user.id,
             email: user.email,
             username: user.username,
-        }
+        },
+        jwtToken
     });
 });
 exports.loginUser = loginUser;

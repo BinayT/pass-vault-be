@@ -17,9 +17,10 @@
             "@routes/*": ["routes/*"],
             "@helpers/*": ["helpers/*"],
             "@utils/*": ["utils/*"],
+            "@middlewares/*": ["middlewares/*"],
         },
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "src/types/**/*.d.ts"],
     "exclude": ["node_modules"]
 }
   
