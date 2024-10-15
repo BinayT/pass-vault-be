@@ -8,4 +8,6 @@ const UserController_1 = require("@controllers/User/UserController");
 const router = express_1.default.Router();
 // Route for user registration
 router.post('/register', UserController_1.registerUser);
+// Route for user login
+router.post('/login', UserController_1.loginUser);
 exports.default = router;

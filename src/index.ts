@@ -2,7 +2,6 @@ import 'module-alias/register';
 import express from 'express';
 
 import userRoutes from '@routes/userRoutes';
-import authRoutes from '@routes/authRoutes';
 import vaultEntryRoutes from '@routes/vaultEntryRoutes';
 
 const app = express();
@@ -12,7 +11,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
 app.use('/api/vaults', vaultEntryRoutes);
 
 app.listen(port, () => {
