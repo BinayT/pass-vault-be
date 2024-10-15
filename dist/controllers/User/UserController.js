@@ -40,16 +40,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(500).json({ message: 'Error creating user', error });
         return;
     }
-    const jwtToken = (0, generateJWTToken_1.generateToken)(newUser === null || newUser === void 0 ? void 0 : newUser.id);
-    res.status(201).json({
-        message: 'User registered successfully',
-        jwtToken,
-        user: {
-            id: newUser.id,
-            email: newUser.email,
-            username: newUser.username,
-        }
-    });
+    res.status(201).json({ message: 'User registered successfully' });
 });
 exports.registerUser = registerUser;
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

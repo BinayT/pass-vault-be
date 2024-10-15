@@ -37,19 +37,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
         return;
     }
 
-    const jwtToken = generateToken(newUser?.id)
-
-    res.status(201).json({ 
-        message: 'User registered successfully',
-        jwtToken,
-        user:{
-            id: newUser.id,
-            email: newUser.email,
-            username: newUser.username,
-        }
-    },
-        
-    );
+    res.status(201).json({message: 'User registered successfully'});
 };
 
 
