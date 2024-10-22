@@ -6,12 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("module-alias/register");
 const express_1 = __importDefault(require("express"));
 const authRoutes_1 = __importDefault(require("@routes/authRoutes"));
+const userRoutes_1 = __importDefault(require("@routes/userRoutes"));
 const vaultEntryRoutes_1 = __importDefault(require("@routes/vaultEntryRoutes"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 app.use(express_1.default.json());
 // Routes
 app.use('/api/auth', authRoutes_1.default);
+app.use('/api/user', userRoutes_1.default);
 app.use('/api/vault', vaultEntryRoutes_1.default);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
