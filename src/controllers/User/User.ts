@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import supabase from '@config/db';
+import pool from '@config/db';
 import bcrypt from 'bcrypt';
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
@@ -12,61 +12,49 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         return;
     }
 
-    // I check if the email exists and it's not equal to the same user id.
-    const { data: emailCheck, error: emailError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .neq('id', userId);
+    try {
+        const { rows: emailCheck } = await pool.query(
+            'SELECT id FROM users WHERE email = $1 AND id <> $2',
+            [email, userId]
+        );
 
-    // I check if the username exists and it's not equal to the same user id.
-    const { data: usernameCheck, error: usernameError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .neq('id', userId);
+        const { rows: usernameCheck } = await pool.query(
+            'SELECT id FROM users WHERE username = $1 AND id <> $2',
+            [username, userId]
+        );
 
-    // If any error occurs, i throw an error.
-    if(usernameError || emailError){
-        res.status(500).json({ message: 'An error occurred during validation.', usernameError, emailError });
-        return;
-    }
+        if (emailCheck.length > 0) {
+            res.status(400).json({ message: 'Email already in use.' });
+            return;
+        }
 
-    // If email exists where the same email is being used but with different user id, means email is already in use.
-    if (emailCheck.length > 0) {
-        res.status(400).json({ message: 'Email already in use.' });
-        return;
-    }
+        if (usernameCheck.length > 0) {
+            res.status(400).json({ message: 'Username already in use.' });
+            return;
+        }
 
-    // Same here, if username exists where the same username is being used but with different user id, means username is already in use.
-    if (usernameCheck.length > 0) {
-        res.status(400).json({ message: 'Username already in use.' });
-        return;
-    }
+        let hashedPassword: string | undefined = undefined;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(password, salt);
+        }
 
-    // If we reach here, it means the email and username isn't in use. So we hash the password.
-    let hashedPassword = undefined;
-    if (password) {
-        const salt = await bcrypt.genSalt(10);
-        hashedPassword = await bcrypt.hash(password, salt);
-    }
+        const fields: string[] = [];
+        const values: any[] = [];
+        let idx = 1;
 
-    // Here we update the user.
-    const { error: updateError } = await supabase
-        .from('users')
-        .update({
-            email,
-            username,
-            ...(hashedPassword && { password: hashedPassword })
-        })
-        .eq('id', userId);
+        if (email) { fields.push(`email = $${idx++}`); values.push(email); }
+        if (username) { fields.push(`username = $${idx++}`); values.push(username); }
+        if (hashedPassword) { fields.push(`password = $${idx++}`); values.push(hashedPassword); }
 
-    // If there is any error, we send the error.
-    if (updateError) {
+        values.push(userId);
+
+        const query = `UPDATE users SET ${fields.join(', ')} WHERE id = $${idx}`;
+
+        await pool.query(query, values);
+
+        res.status(201).json({ message: 'User updated successfully' });
+    } catch (updateError) {
         res.status(500).json({ message: 'Failed to update user.', updateError });
-        return;
     }
-
-    // If everything goes right, we update the user.
-    res.status(201).json({message: 'User updated successfully'});
 };

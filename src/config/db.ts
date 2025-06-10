@@ -1,14 +1,13 @@
 // config/db.ts
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Initialize PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-// Export the Supabase client for use in other modules
-export default supabase;
+export default pool;
